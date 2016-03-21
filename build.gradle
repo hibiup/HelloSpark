@@ -1,0 +1,23 @@
+group 'com.wang.hello'
+version '1.0.0-SNAPSHOT'
+
+apply plugin: 'scala'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+sourceCompatibility = 1.6
+
+repositories {
+    mavenLocal()
+    //mavenCentral()
+    jcenter()
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.11.7'
+    //compile "org.scala-lang:scala-parser-combinators:2.11.0-M4"
+    //compile "org.scala-lang:scala-actors:2.11.7"
+
+    testCompile "org.scalatest:scalatest_2.11:2.1.3"
+}

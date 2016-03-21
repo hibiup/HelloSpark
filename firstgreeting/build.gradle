@@ -1,0 +1,54 @@
+group 'com.wang.hello'
+version '1.0.0-SNAPSHOT'
+
+apply plugin: 'scala'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+apply plugin: 'maven'
+
+repositories {
+    jcenter()
+    //mavenCentral()
+    mavenLocal()
+}
+
+configurations {
+    provided
+    compile.extendsFrom provided
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "com.wang.hello.spark.Hello"
+    }
+
+    from {
+        // Exclude provided from compile for JAR package
+        (configurations.compile - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+    // Make a JAR package with lib folder contents all dependencies
+    /*into('lib') {
+        from (configurations.compile - configurations.provided)
+    }*/
+}
+
+sourceSets {
+    main {
+        compileClasspath += configurations.provided
+    }
+}
+
+dependencies {
+    compile 'org.scala-lang:scala-library:2.11.7'
+    compile "org.scala-lang:scala-parser-combinators:2.11.0-M4"
+    compile "org.scala-lang:scala-actors:2.11.7"
+
+    compile 'org.slf4j:slf4j-api:1.7.12'
+
+    provided 'org.apache.spark:spark-assembly_2.10:1.1.0'
+    provided 'org.apache.spark:spark-core_2.10:1.1.0'
+
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.scalatest:scalatest_2.11:2.1.3"
+}
