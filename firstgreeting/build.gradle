@@ -10,6 +10,10 @@ repositories {
     jcenter()
     //mavenCentral()
     mavenLocal()
+    maven {
+        name 'internal'
+        url 'http://mvn.int.htche.com/archiva/repository/internal/'
+    }
 }
 
 configurations {
@@ -19,18 +23,18 @@ configurations {
 
 jar {
     manifest {
-        attributes "Main-Class": "com.wang.hello.spark.Hello"
+        attributes "Main-Class": "com.wang.hello.hadoop.Hello"
     }
 
-    from {
-        // Exclude provided from compile for JAR package
+    // Exclude provided from compile for JAR package
+    /*from {
         (configurations.compile - configurations.provided).collect { it.isDirectory() ? it : zipTree(it) }
-    }
+    }*/
 
     // Make a JAR package with lib folder contents all dependencies
-    /*into('lib') {
+    into('lib') {
         from (configurations.compile - configurations.provided)
-    }*/
+    }
 }
 
 sourceSets {
@@ -41,14 +45,14 @@ sourceSets {
 
 dependencies {
     compile 'org.scala-lang:scala-library:2.11.7'
-    compile "org.scala-lang:scala-parser-combinators:2.11.0-M4"
-    compile "org.scala-lang:scala-actors:2.11.7"
-
+    //compile "org.scala-lang:scala-parser-combinators:2.11.0-M4"
+    //compile "org.scala-lang:scala-actors:2.11.7"
+    compile "org.scala-lang.modules:scala-xml_2.11:1.0.3"
     compile 'org.slf4j:slf4j-api:1.7.12'
 
-    provided 'org.apache.spark:spark-assembly_2.10:1.1.0'
-    provided 'org.apache.spark:spark-core_2.10:1.1.0'
+    provided 'org.apache.hadoop:hadoop-client:2.7.2'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile "org.scala-lang:scala-library:2.11.7"
     testCompile "org.scalatest:scalatest_2.11:2.1.3"
 }
