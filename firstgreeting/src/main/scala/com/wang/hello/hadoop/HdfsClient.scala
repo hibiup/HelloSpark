@@ -1,5 +1,10 @@
 package com.wang.hello.hadoop
 
+/**
+  * Created by wangji on 2016/3/21.
+  */
+import org.apache.log4j.Logger;
+
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.fs._
 
@@ -18,20 +23,31 @@ import java.io.FileInputStream
 import java.io.InputStream
 
 /**
-  * Created by wangji on 2016/3/21.
+  *
+  * @param username
+  * @param groupname
   */
 class HdfsClient(val username:String, val groupname:String) {
-    def this(username:String)  {
-        this(username, "supergroup")
-    }
-
+    val logger = Logger.getLogger(this.getClass)
+    /**
+      * 基于 HADOOP 配置文件建立到达 HDFS 的连接
+      */
     val conf = new Configuration()
     conf.addResource("core-site.xml")
     conf.addResource("hdfs-site.xml")
     System.setProperty("HADOOP_USER_NAME",username)
     System.setProperty("HADOOP_GROUP_NAME", groupname)
 
+    // 获得 HDFS 文件系统句柄
     val fileSystem = FileSystem.get(conf)
+
+    /**
+      * 二次构造函数
+      * @param username
+      */
+    def this(username:String)  {
+        this(username, "supergroup")
+    }
 
     def save(filepath: String): Unit = {
         val file = new File(filepath)

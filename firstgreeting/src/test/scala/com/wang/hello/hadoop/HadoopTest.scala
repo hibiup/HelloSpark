@@ -30,4 +30,16 @@ class HadoopTest extends FunSuite{
         val client:HdfsClient = new HdfsClient("root")
         client.rd("/temp")
     }
+
+    test("read dir") {
+        val client:HdfsClient = new HdfsClient("root")
+        val in = client.read("/user/root/host.access.shop.log-sample")
+
+        var b = new Array[Byte](1024)
+        var numBytes = in.read(b)
+        while (numBytes > 0) {
+            println(new String(b, "UTF-8"))
+            numBytes = in.read(b)
+        }
+    }
 }
