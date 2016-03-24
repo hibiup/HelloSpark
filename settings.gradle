@@ -1,3 +1,3 @@
 rootProject.name = 'HelloSpark'
 
-include 'FirstGreeting'
+include 'firstgreeting'
