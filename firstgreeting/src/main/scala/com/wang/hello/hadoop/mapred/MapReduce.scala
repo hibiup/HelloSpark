@@ -10,8 +10,8 @@ import java.util._
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.fs.FileSystem
-import org.apache.hadoop.conf._
-import org.apache.hadoop.io._
+import org.apache.hadoop.conf.Configuration
+import org.apache.hadoop.io.{IntWritable, Text, LongWritable}
 import org.apache.hadoop.mapreduce._
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
@@ -60,6 +60,7 @@ class WordCount(username: String, groupname: String) {
     conf.addResource("hdfs-site.xml")
     System.setProperty("HADOOP_USER_NAME", username)
     System.setProperty("HADOOP_GROUP_NAME", groupname)
+    System.setProperty("log4j.debug","true")
 
     val fs = FileSystem.get(conf);
 
@@ -67,13 +68,19 @@ class WordCount(username: String, groupname: String) {
         // Job configuration
         val job = Job.getInstance(conf, "WordCount")
         job.setJarByClass(this.getClass)
-        job.setOutputKeyClass(classOf[Text])
-        job.setOutputValueClass(classOf[IntWritable])
 
         // Setup map and reduce
         job.setMapperClass(classOf[TokenizerMapper])
         job.setCombinerClass(classOf[IntSumReducer])
         job.setReducerClass(classOf[IntSumReducer])
+
+        // Set input key and value types
+        job.setMapOutputKeyClass(classOf[LongWritable])
+        job.setMapOutputValueClass(classOf[Text])
+
+        // Set outp key and value types
+        job.setOutputKeyClass(classOf[Text])
+        job.setOutputValueClass(classOf[IntWritable])
 
         // Setup input and output
         FileInputFormat.setInputPaths(job, new Path(args(0)))
@@ -94,13 +101,14 @@ class WordCount(username: String, groupname: String) {
           * waitForCompletion函数会提交Job到对应的Cluster，并等待Job执行结束。函数的boolean参数表示是否打印Job执行的相关信息。返回的结果是
           * 一个boolean变量，用来标识Job的执行结果。
           */
-        System.exit(job.waitForCompletion(true) match {case true =>0; case _ => 1})
+        job.waitForCompletion(true)
     }
 }
 
 object WordCount {
     def main(args: Array[String]) {
         val wordCount = new WordCount("root", "supergroup")
-        wordCount.count(args)
+        System.exit(wordCount.count(args) match {case true =>0; case _ => 1})
+
     }
 }

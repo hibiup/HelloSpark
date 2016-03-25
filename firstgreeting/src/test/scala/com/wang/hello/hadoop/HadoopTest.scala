@@ -10,8 +10,8 @@ class HadoopTest extends FunSuite{
     import org.apache.hadoop.conf.Configuration
     test("config") {
         val conf = new Configuration()
-        conf .addResource("configure-1.xml")
-        conf .addResource("configure-2.xml")
+        conf.addResource("configure-1.xml")
+        conf.addResource("configure-2.xml")
         println(conf.get("size-weight"))
     }
 
