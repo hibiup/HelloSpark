@@ -31,6 +31,7 @@ class TokenizerMapper extends Mapper[LongWritable, Text, Text, IntWritable] {
 
     @throws(classOf[IOException])
     @throws(classOf[InterruptedException])
+    // Notice the "Context" argument must be inherited from Mapper also
     override def map(key: LongWritable, value: Text, context: Mapper[LongWritable, Text, Text, IntWritable]#Context) {
         val line = value.toString
         val tokenizer = new StringTokenizer(line)
