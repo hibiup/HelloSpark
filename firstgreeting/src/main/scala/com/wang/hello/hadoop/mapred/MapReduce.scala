@@ -4,15 +4,17 @@ package com.wang.hello.hadoop.mapred
   * Created by wangji on 2016/3/24.
   */
 
-import org.apache.log4j.Logger;
+import java.io.IOException
+import java.lang.Iterable
 
+import org.apache.log4j.Logger
 import java.util._
 
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.conf.Configuration
-import org.apache.hadoop.io.{IntWritable, Text, LongWritable}
-import org.apache.hadoop.mapreduce._
+import org.apache.hadoop.io.{IntWritable, LongWritable, Text}
+import org.apache.hadoop.mapreduce.{Job, Mapper, Reducer}
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
 
@@ -27,7 +29,9 @@ class TokenizerMapper extends Mapper[LongWritable, Text, Text, IntWritable] {
     private val one = new IntWritable(1);
     private val word = new Text();
 
-    def map(key: LongWritable, value: Text, context: Context) {
+    @throws(classOf[IOException])
+    @throws(classOf[InterruptedException])
+    override def map(key: LongWritable, value: Text, context: Mapper[LongWritable, Text, Text, IntWritable]#Context) {
         val line = value.toString
         val tokenizer = new StringTokenizer(line)
         while (tokenizer.hasMoreTokens) {
@@ -40,8 +44,10 @@ class TokenizerMapper extends Mapper[LongWritable, Text, Text, IntWritable] {
 class IntSumReducer extends Reducer[Text, IntWritable, Text, IntWritable] {
     val logger = Logger.getLogger(this.getClass)
 
-    def reduce(key: Text, values: Iterator[IntWritable], context: Context) {
-        context.write(key, new IntWritable(count(0, values)))
+    @throws(classOf[IOException])
+    @throws(classOf[InterruptedException])
+    override def reduce(key: Text, values: Iterable[IntWritable], context: Reducer[Text, IntWritable, Text, IntWritable]#Context) {
+        context.write(key, new IntWritable(count(0, values.iterator())))
 
         def count(sum: Int, vs: Iterator[IntWritable]): Int =
             if (vs.hasNext)
@@ -74,8 +80,8 @@ class WordCount(username: String, groupname: String) {
         job.setReducerClass(classOf[IntSumReducer])
 
         // Set input key and value types
-        job.setMapOutputKeyClass(classOf[LongWritable])
-        job.setMapOutputValueClass(classOf[Text])
+        //job.setMapOutputKeyClass(classOf[Text])
+        //job.setMapOutputValueClass(classOf[IntWritable])
 
         // Set outp key and value types
         job.setOutputKeyClass(classOf[Text])
