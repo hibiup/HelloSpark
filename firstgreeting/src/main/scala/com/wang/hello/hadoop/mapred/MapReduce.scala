@@ -60,7 +60,6 @@ class WordCount(username: String, groupname: String) {
     conf.addResource("hdfs-site.xml")
     System.setProperty("HADOOP_USER_NAME", username)
     System.setProperty("HADOOP_GROUP_NAME", groupname)
-    System.setProperty("log4j.debug","true")
 
     val fs = FileSystem.get(conf);
 
