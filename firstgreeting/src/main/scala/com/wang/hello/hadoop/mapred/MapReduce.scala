@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import java.util._
 
 import org.apache.hadoop.fs.Path
+import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.conf._
 import org.apache.hadoop.io._
 import org.apache.hadoop.mapreduce._
@@ -60,6 +61,8 @@ class WordCount(username: String, groupname: String) {
     System.setProperty("HADOOP_USER_NAME", username)
     System.setProperty("HADOOP_GROUP_NAME", groupname)
 
+    val fs = FileSystem.get(conf);
+
     def count(args: Array[String]) = {
         // Job configuration
         val job = Job.getInstance(conf, "WordCount")
@@ -74,7 +77,9 @@ class WordCount(username: String, groupname: String) {
 
         // Setup input and output
         FileInputFormat.setInputPaths(job, new Path(args(0)))
-        FileOutputFormat.setOutputPath(job, new Path(args(1)))
+        val out = new Path(args(1))
+        fs.delete(out, true);
+        FileOutputFormat.setOutputPath(job,out)
 
         /**
           * Job类中提供了两种启动Job的方式：
