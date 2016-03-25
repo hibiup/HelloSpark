@@ -21,7 +21,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat
   *
   * LongWritable 相当于 Long，是行数偏移量. Text 相当于String，是每一行的内容，IntWritable相当于 Int，输出统计结果
   */
-class Map extends Mapper[LongWritable, Text, Text, IntWritable] {
+class TokenizerMapper extends Mapper[LongWritable, Text, Text, IntWritable] {
     val logger = Logger.getLogger(this.getClass)
 
     private val one = new IntWritable(1);
@@ -37,7 +37,7 @@ class Map extends Mapper[LongWritable, Text, Text, IntWritable] {
     }
 }
 
-class Reduce extends Reducer[Text, IntWritable, Text, IntWritable] {
+class IntSumReducer extends Reducer[Text, IntWritable, Text, IntWritable] {
     val logger = Logger.getLogger(this.getClass)
 
     def reduce(key: Text, values: Iterator[IntWritable], context: Context) {
@@ -71,9 +71,9 @@ class WordCount(username: String, groupname: String) {
         job.setOutputValueClass(classOf[IntWritable])
 
         // Setup map and reduce
-        job.setMapperClass(classOf[Map])
-        job.setCombinerClass(classOf[Reduce])
-        job.setReducerClass(classOf[Reduce])
+        job.setMapperClass(classOf[TokenizerMapper])
+        job.setCombinerClass(classOf[IntSumReducer])
+        job.setReducerClass(classOf[IntSumReducer])
 
         // Setup input and output
         FileInputFormat.setInputPaths(job, new Path(args(0)))
@@ -94,7 +94,7 @@ class WordCount(username: String, groupname: String) {
           * waitForCompletion函数会提交Job到对应的Cluster，并等待Job执行结束。函数的boolean参数表示是否打印Job执行的相关信息。返回的结果是
           * 一个boolean变量，用来标识Job的执行结果。
           */
-        job.waitForCompletion(true) match {case true =>0; case _ => 1}
+        System.exit(job.waitForCompletion(true) match {case true =>0; case _ => 1})
     }
 }
 
