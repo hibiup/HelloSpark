@@ -11,7 +11,24 @@ class WordCountTest extends FunSuite {
     import com.wang.hello.hadoop.mapred.WordCount
 
     test("word count") {
-        val wordCount = new WordCount("root", "supergroup")
-        wordCount.count(Array("/user/root/host.access.shop.log-sample", "/user/root/count"))
+        val user = "root"
+        val userGroup = "supergroup";
+        val outPath = "/user/root/count"
+        val outFile = "part-r-00000"
+        val inFile = "/user/root/host.access.shop.log-sample"
+
+        val wordCount = new WordCount(user, userGroup)
+        wordCount.count(Array(inFile, outPath))
+
+        // Print result
+        val client:HdfsClient = new HdfsClient(user)
+        val in = client.read(outPath+ "/" + outFile)
+
+        var b = new Array[Byte](1024)
+        var numBytes = in.read(b)
+        while (numBytes > 0) {
+            println(new String(b, "UTF-8"))
+            numBytes = in.read(b)
+        }
     }
 }
