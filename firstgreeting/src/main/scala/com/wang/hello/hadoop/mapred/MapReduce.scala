@@ -59,6 +59,7 @@ class Reduce extends MapReduceBase with Reducer[Text, IntWritable, Text, IntWrit
 class WordCount(username:String, groupname:String) {
     val logger = Logger.getLogger(this.getClass)
 
+    // HDFS configuration
     val conf = new Configuration()
     conf.addResource("core-site.xml")
     conf.addResource("hdfs-site.xml")
@@ -66,17 +67,20 @@ class WordCount(username:String, groupname:String) {
     System.setProperty("HADOOP_GROUP_NAME", groupname)
 
     def count(args: Array[String]) = {
+        // Job configuration
         val jobConf = new JobConf(conf, this.getClass)
         jobConf.setJobName("WordCount")
         jobConf.setOutputKeyClass(classOf[Text])
         jobConf.setOutputValueClass(classOf[IntWritable])
 
+        // Setup map and reduce
         jobConf.setMapperClass(classOf[Map])
         jobConf.setCombinerClass(classOf[Reduce])
         jobConf.setReducerClass(classOf[Reduce])
         jobConf.setInputFormat(classOf[TextInputFormat])
         jobConf.setOutputFormat(classOf[TextOutputFormat[Text, IntWritable]])
 
+        // Setup input and output
         FileInputFormat.setInputPaths(jobConf, new Path(args(0)))
         FileOutputFormat.setOutputPath(jobConf, new Path(args(1)))
 
