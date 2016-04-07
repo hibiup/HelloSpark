@@ -7,16 +7,34 @@ package com.wang.hello.spark
 import org.apache.spark.api.java.JavaSparkContext
 import org.apache.spark.api.java.JavaRDD
 import org.apache.spark.SparkConf
+import org.apache.spark.SparkContext
+
+import org.apache.log4j.Logger
 
 object HelloSpark {
-    final val appName: String = "Hello Spark"
+    val appName: String = "Hello Spark"
 
     def main(args: Array[String]): Unit = {
-        val spark = new HelloSpark(args(0))
+        if(args.length >= 1) {
+            val spark = new HelloSpark(args(0))
+        }
+        else {
+            val spark = new HelloSpark()
+        }
     }
 }
 
 class HelloSpark(val master: String) {
-    val conf = new SparkConf().setAppName(HelloSpark.appName).setMaster(master);
-    val sc = new JavaSparkContext(conf);
+    var logger = Logger.getLogger(this.getClass)
+    def this() = this(null)
+
+    val conf = new SparkConf().setAppName(HelloSpark.appName)
+    if(null != master) {
+        logger.debug("Master URL: " +  master)
+        conf.setMaster(master)
+    }
+    else
+        logger.debug("No master URL has been specified")
+
+    val sc = new SparkContext(conf)
 }

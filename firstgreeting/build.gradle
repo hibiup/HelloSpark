@@ -1,29 +1,20 @@
-group 'com.wang.hello'
-version '1.0.0-SNAPSHOT'
+dependencies {
+    compile "log4j:log4j:${log4jVersion}"
+    compile "org.slf4j:slf4j-api:1.7.12"
 
-apply plugin: 'scala'
-apply plugin: 'idea'
-apply plugin: 'eclipse'
-apply plugin: 'maven'
+    provided "org.apache.spark:spark-core_${scalaMajorVersion}:${sparkVersion}"
 
-repositories {
-    jcenter()
-    //mavenCentral()
-    mavenLocal()
-    maven {
-        name 'internal'
-        url 'http://mvn.int.htche.com/archiva/repository/internal/'
-    }
-}
-
-configurations {
-    provided
-    compile.extendsFrom provided
+    // required by hadoop example mapred.WordCount
+    provided "org.apache.hadoop:hadoop-client:${hadoopClientVersion}"
+    provided "org.apache.hadoop:hadoop-common:${hadoopClientVersion}"
 }
 
 jar {
     manifest {
-        attributes "Main-Class": "com.wang.hello.hadoop.mapred.WordCount"
+        attributes (
+                "Main-Class": "com.wang.hello.spark.HelloSpark",
+                "Class-Path": configurations.compile.collect { 'lib/' + it.getName() }.join(' ')
+        )
     }
 
     // Exclude provided from compile for JAR package
@@ -33,28 +24,6 @@ jar {
 
     // Make a JAR package with lib folder contents all dependencies
     into('lib') {
-        from (configurations.compile - configurations.provided)
+        from (configurations.compile)
     }
-}
-
-sourceSets {
-    main {
-        compileClasspath += configurations.provided
-    }
-}
-
-dependencies {
-    compile ('org.scala-lang:scala-library:2.10.5')
-    /*compile ('org.scala-lang.modules:scala-xml_2.11:1.0.3') {
-        exclude module: 'scala-library'
-    }*/
-    //compile "org.scala-lang:scala-parser-combinators:2.11.0-M4"
-    compile "org.scala-lang:scala-actors:2.10.5"
-    compile 'org.slf4j:slf4j-api:1.7.12'
-
-    provided 'org.apache.spark:spark-core_2.10:1.6.1'
-    provided 'org.apache.hadoop:hadoop-client:2.2.0'
-
-    testCompile group: 'junit', name: 'junit', version: '4.11'
-    testCompile "org.scalatest:scalatest_2.10:2.1.3"
 }
