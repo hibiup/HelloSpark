@@ -13,6 +13,6 @@ import org.junit._, runner.RunWith, Assert._
 class HelloSparkTest extends FunSpec {
     describe("hello spark") {
         val helloSpark = new HelloSpark("root", "spark://hadoop:7077")
-        //println("Something!")
+        println(helloSpark.wordCount("hdfs://hadoop:9000/user/root/host.access.shop.log-sample"))
     }
 }
