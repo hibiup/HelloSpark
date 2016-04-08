@@ -116,6 +116,12 @@ class HelloSpark(val user: String, val master: String) {
         }
     }
 
+    /**
+      * Save result to HDFS
+      *
+      * @param result
+      * @param path
+      */
     def writeToHdfs(result:Any, path:String): Unit = {
         result match {
             case a: RDD[(String, Int)] => a.saveAsTextFile(path)
