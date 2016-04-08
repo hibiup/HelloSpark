@@ -58,7 +58,7 @@ class HelloSpark(val user: String, val master: String) {
         /**
           * Open file from HDFS
           */
-        val file = sc.textFile("hdfs://hadoop:9000/user/root/host.access.shop.log-sample")
+        val file = sc.textFile(path)
 
         /**
           * map: 是对RDD中的每个元素都执行一个指定的函数来产生一个新的RDD。任何原RDD中的元素在新RDD中都有且只有一个元素与之对应。
