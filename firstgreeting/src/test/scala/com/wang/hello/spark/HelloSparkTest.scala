@@ -17,13 +17,17 @@ import org.apache.spark.rdd.RDD
 @RunWith(classOf[JUnitRunner])
 class HelloSparkTest extends FunSpec {
     var logger = Logger.getLogger(this.getClass)
+    var master = "spark://hadoop:7077"
+    var input = "hdfs://hadoop:9000/user/root/host.access.shop.log-sample"
+    var jars = Array("/root/IdeaProjects/HelloSpark/firstgreeting/build/libs/firstgreeting-1.0.0-SNAPSHOT.jar")
 
     describe("hello spark") {
-        val helloSpark = new HelloSpark("root", "local")
+        val helloSpark = new HelloSpark("root", master)
+        jars.foreach(s => helloSpark.sc.addJar(s))
         try {
-            val res = helloSpark.wordCount("hdfs://hadoop:9000/user/root/host.access.shop.log-sample")
+            val res = helloSpark.wordCount(input)
             res match {
-                case a:Array[(String, Int)] =>  a.foreach((x) => println(x._1 + "\t" + x._2))
+                case a:RDD[(String, Int)] =>  a.collect().foreach((x) => println(x._1 + "\t" + x._2))
                 case _ => println("Nothing")
             }
         }

@@ -13,8 +13,13 @@ import org.apache.log4j.Logger
 
 object HelloSpark {
     val appName: String = "Hello Spark"
+    val input = "hdfs://hadoop:9000/user/root/host.access.shop.log-sample"
+    val target = "hdfs://hadoop:9000/user/root/wordcount"
+    var logger = Logger.getLogger(this.getClass)
 
     def main(args: Array[String]): Unit = {
+        var jars = Array(this.getClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+
         val spark = if (args.length == 2) {
             new HelloSpark(args(0), args(1))
         }
@@ -24,17 +29,25 @@ object HelloSpark {
         else {
             new HelloSpark()
         }
+        jars.foreach(s => {
+            logger.debug("Add driver-class-path: " + s)
+            spark.sc.addJar(s)
+        })
+
+        val result = spark.wordCount(input)
+        spark.writeToHdfs(result, target)
     }
 }
 
 class HelloSpark(val user: String, val master: String) {
     def this() = this(null, null)
-
     def this(user: String) = this(user, null)
 
     var logger = Logger.getLogger(this.getClass)
+    //var jars = Array(this.getClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
+
     val conf = new SparkConf().setAppName(HelloSpark.appName)
-    conf.setJars(List[String](this.getClass.getName))
+    //conf.setJars(jars)
 
     if (user != null) {
         conf.set("spark.ui.view.acls", user)
@@ -87,10 +100,17 @@ class HelloSpark(val user: String, val master: String) {
           */
         val count = file.flatMap(line => line.split(" ")).map(word => (word, 1)).reduceByKey(_ + _)
         try{
-            count.collect()
+            count
         }
         catch {
             case e:Exception => logger.debug(e.getMessage(), e)
+        }
+    }
+
+    def writeToHdfs(result:Any, path:String): Unit = {
+        result match {
+            case a: RDD[(String, Int)] => a.saveAsTextFile(path)
+            case _ => sc.parallelize("Nothing").saveAsTextFile(path)
         }
     }
 }

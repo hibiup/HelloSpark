@@ -13,7 +13,7 @@ class WordCountTest extends FunSuite {
     test("word count") {
         val user = "root"
         val userGroup = "supergroup";
-        val outPath = "/user/root/count"
+        val outPath = "/user/root/wordcount"
         val outFile = "part-r-00000"
         val inFile = "/user/root/host.access.shop.log-sample"
 
