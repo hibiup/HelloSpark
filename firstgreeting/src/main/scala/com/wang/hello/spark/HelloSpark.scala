@@ -10,16 +10,21 @@ import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
 import org.apache.log4j.Logger
+import com.typesafe.config.ConfigFactory
 
 object HelloSpark {
     val appName: String = "Hello Spark"
-    val input = "hdfs://hadoop:9000/user/root/host.access.shop.log-sample"
-    val target = "hdfs://hadoop:9000/user/root/wordcount"
+    val input = "spark.wordcount.input" //"hdfs://hadoop:9000/user/root/host.access.shop.log-sample"
+    val target = "spark.wordcount.output" //"hdfs://hadoop:9000/user/root/wordcount"
     var logger = Logger.getLogger(this.getClass)
+    val propConf = ConfigFactory.load("spark.properties")
 
     def main(args: Array[String]): Unit = {
         var jars = Array(this.getClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
 
+        /**
+          * Set arguments
+          */
         val spark = if (args.length == 2) {
             new HelloSpark(args(0), args(1))
         }
@@ -29,13 +34,20 @@ object HelloSpark {
         else {
             new HelloSpark()
         }
+
+        /**
+          * Load driver
+          */
         jars.foreach(s => {
             logger.debug("Add driver-class-path: " + s)
             spark.sc.addJar(s)
         })
 
-        val result = spark.wordCount(input)
-        spark.writeToHdfs(result, target)
+        /**
+          * Count!
+          */
+        val result = spark.wordCount(propConf.getString(input))
+        spark.writeToHdfs(result, propConf.getString(target))
     }
 }
 
@@ -44,11 +56,8 @@ class HelloSpark(val user: String, val master: String) {
     def this(user: String) = this(user, null)
 
     var logger = Logger.getLogger(this.getClass)
-    //var jars = Array(this.getClass.getProtectionDomain().getCodeSource().getLocation().toURI().getPath())
 
     val conf = new SparkConf().setAppName(HelloSpark.appName)
-    //conf.setJars(jars)
-
     if (user != null) {
         conf.set("spark.ui.view.acls", user)
         conf.set("spark.modify.acls", user)
