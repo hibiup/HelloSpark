@@ -2,11 +2,10 @@ dependencies {
     compile "log4j:log4j:${log4jVersion}"
     compile "org.slf4j:slf4j-api:1.7.12"
 
-    provided "org.apache.spark:spark-core_${scalaMajorVersion}:${sparkVersion}"
+    compile "org.apache.spark:spark-core_${scalaMajorVersion}:${sparkVersion}"
 
     // required by hadoop example mapred.WordCount
-    provided "org.apache.hadoop:hadoop-client:${hadoopClientVersion}"
-    provided "org.apache.hadoop:hadoop-common:${hadoopClientVersion}"
+    compile "org.apache.hadoop:hadoop-client:${hadoopClientVersion}"
 }
 
 jar {

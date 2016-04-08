@@ -5,7 +5,7 @@ package com.wang.hello.spark
   */
 
 import org.apache.spark.api.java.JavaSparkContext
-import org.apache.spark.api.java.JavaRDD
+import org.apache.spark.rdd.RDD
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
 
@@ -33,8 +33,8 @@ class HelloSpark(val user: String, val master: String) {
     def this(user: String) = this(user, null)
 
     var logger = Logger.getLogger(this.getClass)
-
     val conf = new SparkConf().setAppName(HelloSpark.appName)
+    conf.setJars(List[String](this.getClass.getName))
 
     if (user != null) {
         conf.set("spark.ui.view.acls", user)
@@ -54,7 +54,7 @@ class HelloSpark(val user: String, val master: String) {
     /**
       * map reduce
       */
-    def wordCount(path: String): Unit = {
+    def wordCount(path: String): Any = {
         /**
           * Open file from HDFS
           */
@@ -69,7 +69,7 @@ class HelloSpark(val user: String, val master: String) {
           * res10: Array[Int] = Array(1, 2, 3, 4, 5, 6, 7, 8, 9)
           * scala> b.collect
           * res11: Array[Int] = Array(2, 4, 6, 8, 10, 12, 14, 16, 18)
-
+          *
           * flatMap: 与map类似，区别是原RDD中的元素经map处理后只能生成一个元素，而原RDD中的元素经flatmap处理后可生成多个元素来构建新RDD。
           * 举例：对原RDD中的每个元素x产生y个元素（从1到y，y为元素x的值）
           * scala> val a = sc.parallelize(1 to 4, 2)
@@ -86,5 +86,11 @@ class HelloSpark(val user: String, val master: String) {
           * 更多参考： https://www.zybuluo.com/jewes/note/35032
           */
         val count = file.flatMap(line => line.split(" ")).map(word => (word, 1)).reduceByKey(_ + _)
+        try{
+            count.collect()
+        }
+        catch {
+            case e:Exception => logger.debug(e.getMessage(), e)
+        }
     }
 }
