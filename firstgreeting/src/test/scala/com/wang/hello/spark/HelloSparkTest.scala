@@ -12,7 +12,7 @@ import org.junit._, runner.RunWith, Assert._
 @RunWith(classOf[JUnitRunner])
 class HelloSparkTest extends FunSpec {
     describe("hello spark") {
-        val helloSpark = new HelloSpark("spark://hadoop:7077")
+        val helloSpark = new HelloSpark("root", "spark://hadoop:7077")
         //println("Something!")
     }
 }
