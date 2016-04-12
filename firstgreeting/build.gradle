@@ -3,10 +3,11 @@ dependencies {
     compile "org.slf4j:slf4j-api:1.7.12"
     compile "com.typesafe:config:1.3.0"
 
-    compile "org.apache.spark:spark-core_${scalaMajorVersion}:${sparkVersion}"
-
     // required by hadoop example mapred.WordCount
     compile "org.apache.hadoop:hadoop-client:${hadoopClientVersion}"
+
+    compile "org.apache.spark:spark-core_${scalaMajorVersion}:${sparkVersion}"
+    compile "org.apache.spark:spark-streaming_${scalaMajorVersion}:${sparkVersion}"
 }
 
 jar {
