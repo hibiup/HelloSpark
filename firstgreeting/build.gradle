@@ -8,6 +8,7 @@ dependencies {
 
     compile "org.apache.spark:spark-core_${scalaMajorVersion}:${sparkVersion}"
     compile "org.apache.spark:spark-streaming_${scalaMajorVersion}:${sparkVersion}"
+    compile "org.apache.spark:spark-sql_${scalaMajorVersion}:${sparkVersion}"
 }
 
 jar {

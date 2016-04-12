@@ -1,0 +1,2 @@
+{"name":"Yin", "age":19, "address":{ "city":"Columbus", "state":"Ohio"}}
+{"name":"Michael", "age":30, "address":{"city":null,"state":"California"}}
