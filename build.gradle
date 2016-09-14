@@ -34,8 +34,8 @@ allprojects {
         scalaMajorVersion = '2.10'
         scalaMinalVersion = '5'
         scalaTestVersion = '2.1.3'
-        sparkVersion = '1.6.1'
-        hadoopClientVersion = '2.2.0'
+        sparkVersion = '1.6.2'
+        hadoopClientVersion = '2.7.3'
         log4jVersion = '1.2.17'
         junitVersion = '4.11'
     }

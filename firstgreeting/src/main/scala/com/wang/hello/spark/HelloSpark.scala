@@ -14,8 +14,8 @@ import com.typesafe.config.ConfigFactory
 
 object HelloSpark {
     val appName: String = "Hello Spark"
-    val input = "spark.wordcount.input" //"hdfs://hadoop:9000/user/root/host.access.shop.log-sample"
-    val target = "spark.wordcount.output" //"hdfs://hadoop:9000/user/root/wordcount"
+    val input = "spark.wordcount.input"
+    val target = "spark.wordcount.output"
     var logger = Logger.getLogger(this.getClass)
     val propConf = ConfigFactory.load("spark.properties")
 
