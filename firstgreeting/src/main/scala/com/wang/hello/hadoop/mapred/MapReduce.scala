@@ -10,6 +10,7 @@ import java.lang.Iterable
 import org.apache.log4j.Logger
 import java.util._
 
+import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.hadoop.fs.Path
 import org.apache.hadoop.fs.FileSystem
 import org.apache.hadoop.conf.Configuration
@@ -58,19 +59,23 @@ class IntSumReducer extends Reducer[Text, IntWritable, Text, IntWritable] {
     }
 }
 
-class WordCount(username: String, groupname: String) {
+class WordCount(username: String, propConf: Config) {
     val logger = Logger.getLogger(this.getClass)
 
     // HDFS configuration
     val conf = new Configuration()
-    conf.addResource("core-site.xml")
-    conf.addResource("hdfs-site.xml")
+    conf.addResource(propConf.getString("hadoop.config.dir") + "/hdfs-site.xml")
+    conf.addResource(propConf.getString("hadoop.config.dir") + "/core-site.xml")
+
     System.setProperty("HADOOP_USER_NAME", username)
-    System.setProperty("HADOOP_GROUP_NAME", groupname)
+    System.setProperty("HADOOP_GROUP_NAME", "supergroup")
+
+    val input = "spark.wordcount.input"
+    val target = "spark.wordcount.output"
 
     val fs = FileSystem.get(conf);
 
-    def count(args: Array[String]) = {
+    def count() = {
         // Job configuration
         val job = Job.getInstance(conf, "WordCount")
         job.setJarByClass(this.getClass)
@@ -89,8 +94,8 @@ class WordCount(username: String, groupname: String) {
         job.setOutputValueClass(classOf[IntWritable])
 
         // Setup input and output
-        FileInputFormat.setInputPaths(job, new Path(args(0)))
-        val out = new Path(args(1))
+        FileInputFormat.setInputPaths(job, new Path(propConf.getString(input)))
+        val out = new Path(propConf.getString(target))
         fs.delete(out, true);
         FileOutputFormat.setOutputPath(job,out)
 
@@ -112,9 +117,10 @@ class WordCount(username: String, groupname: String) {
 }
 
 object WordCount {
-    def main(args: Array[String]) {
-        val wordCount = new WordCount("root", "supergroup")
-        System.exit(wordCount.count(args) match {case true =>0; case _ => 1})
+    val propConf = ConfigFactory.load("spark.properties")
 
+    def main(args: Array[String]) {
+        val wordCount = new WordCount(args(1), propConf)
+        System.exit(wordCount.count() match {case true =>0; case _ => 1})
     }
 }
