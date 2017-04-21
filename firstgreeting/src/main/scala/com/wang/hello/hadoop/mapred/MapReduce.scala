@@ -59,7 +59,7 @@ class IntSumReducer extends Reducer[Text, IntWritable, Text, IntWritable] {
     }
 }
 
-class WordCount(username: String, propConf: Config) {
+class WordCount(propConf: Config) {
     val logger = Logger.getLogger(this.getClass)
 
     // HDFS configuration
@@ -67,8 +67,8 @@ class WordCount(username: String, propConf: Config) {
     conf.addResource(propConf.getString("hadoop.config.dir") + "/hdfs-site.xml")
     conf.addResource(propConf.getString("hadoop.config.dir") + "/core-site.xml")
 
-    System.setProperty("HADOOP_USER_NAME", username)
-    System.setProperty("HADOOP_GROUP_NAME", "supergroup")
+    System.setProperty("HADOOP_USER_NAME", propConf.getString("mapreduce.user"))
+    System.setProperty("HADOOP_GROUP_NAME", propConf.getString("mapreduce.group"))
 
     val input = "spark.wordcount.input"
     val target = "spark.wordcount.output"
@@ -120,7 +120,7 @@ object WordCount {
     val propConf = ConfigFactory.load("spark.properties")
 
     def main(args: Array[String]) {
-        val wordCount = new WordCount(args(1), propConf)
+        val wordCount = new WordCount(propConf)
         System.exit(wordCount.count() match {case true =>0; case _ => 1})
     }
 }
