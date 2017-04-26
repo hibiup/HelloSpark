@@ -79,5 +79,5 @@ object HBaseRead {
   s.show
 
   df.registerTempTable("table")
-  sqlContext.sql("select count(col1) from table1").show
+  sqlContext.sql("select count(col1) from table").show
 }
