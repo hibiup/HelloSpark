@@ -9,12 +9,15 @@ dependencies {
     compile "org.apache.spark:spark-core_${scalaMajorVersion}:${sparkVersion}"
     compile "org.apache.spark:spark-streaming_${scalaMajorVersion}:${sparkVersion}"
     compile "org.apache.spark:spark-sql_${scalaMajorVersion}:${sparkVersion}"
+
+    compile "com.hortonworks:shc-core:1.1.0-2.1-s_2.11"
+    //compile "com.hortonworks:shc-core:1.1.1-2.1-s_2.11"
 }
 
 jar {
     manifest {
         attributes (
-                "Main-Class": "com.wang.hello.spark.HelloSpark",
+                //"Main-Class": "com.wang.hello.spark.HelloSpark",
                 "Class-Path": configurations.compile.collect { 'lib/' + it.getName() }.join(' ')
         )
     }

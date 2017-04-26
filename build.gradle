@@ -13,9 +13,13 @@ allprojects {
         jcenter()
         //mavenCentral()
         mavenLocal()
-        maven {
+        /*maven {
             name 'internal'
             url 'http://mvn.int.htche.com/archiva/repository/internal/'
+        }*/
+        maven {
+            name 'hortonworks'
+            url 'http://repo.hortonworks.com/content/repositories/releases/'
         }
     }
 
