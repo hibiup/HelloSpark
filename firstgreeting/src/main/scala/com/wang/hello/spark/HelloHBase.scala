@@ -2,7 +2,7 @@
   * Run with command:
   * $ /opt/spark/default/bin/spark-submit \
   *     --class com.wang.hello.spark.HBaseRead \
-  *     --master yarn-cluster \
+  *     --master yarn \
   *     --files /opt/hbase/default/conf/hbase-site.xml \
   *     --packages com.hortonworks:shc-core:1.1.0-2.1-s_2.11 \
   *     --repositories http://repo.hortonworks.com/content/groups/public/ \
