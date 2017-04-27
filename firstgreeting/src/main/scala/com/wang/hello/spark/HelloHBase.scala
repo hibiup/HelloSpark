@@ -17,15 +17,8 @@ package com.wang.hello.spark
 import org.apache.spark._
 import org.apache.spark.sql.execution.datasources.hbase.HBaseTableCatalog
 
-object HBaseRead {
-  val sparkConf = new SparkConf().setAppName("HBaseTest")
-  val sc = new SparkContext(sparkConf)
 
-  val sqlContext = new org.apache.spark.sql.SQLContext(sc)
-  import sqlContext.implicits._
-
-  case class HBaseRecord(col0: String, col1: Boolean,col2: Double, col3: Float,col4: Int, col5: Long, col6: Short, col7: String, col8: Byte)
-
+object HelloHBase {
   // Defune table
   def catalog = s"""{
                     |"table":{"namespace":"default", "name":"table1"},
@@ -43,47 +36,56 @@ object HBaseRead {
                     |}
                     |}""".stripMargin
 
+  case class HBaseRecord(col0: String, col1: Boolean,col2: Double, col3: Float,col4: Int, col5: Long, col6: Short, col7: String, col8: Byte)
 
-  // Create table and write data
   val data = (0 to 255).map {
     i =>  HBaseRecord(i, "extra")
   }
 
-  sc.parallelize(data).toDF.write.options(
-    Map(HBaseTableCatalog.tableCatalog -> catalog, HBaseTableCatalog.newTable -> "5"))
-    .format("org.apache.spark.sql.execution.datasources.hbase")
-    .save()
-
   object HBaseRecord {
     def apply(i: Int, t: String): HBaseRecord = {
       val s = s"""row${"%03d".format(i)}"""
-      HBaseRecord(s, i % 2 == 0, i.toDouble, i.toFloat,  i, i.toLong, i.toShort,  s"String$i: $t", i.toByte)
+      HBaseRecord(s, i%2==0, i.toDouble, i.toFloat, i, i.toLong, i.toShort, s"String$i:$t", i.toByte)
     }
   }
 
-  // Load data
-  def withCatalog(cat: String) = {
-    sqlContext
-      .read
-      .options(Map(HBaseTableCatalog.tableCatalog->cat))
+  def main(args: Array[String]): Unit = {
+    val sparkConf = new SparkConf().setAppName("HBaseTest")
+    val sc = new SparkContext(sparkConf)
+
+    val sqlContext = new org.apache.spark.sql.SQLContext(sc)
+    import sqlContext.implicits._
+
+    // Create table and write data
+    sc.parallelize(data).toDF.write.options(
+      Map(HBaseTableCatalog.tableCatalog -> catalog, HBaseTableCatalog.newTable -> "5"))
       .format("org.apache.spark.sql.execution.datasources.hbase")
-    .load()
+      .save()
+
+    // Load data
+    def withCatalog(cat: String) = {
+      sqlContext
+        .read
+        .options(Map(HBaseTableCatalog.tableCatalog->cat))
+        .format("org.apache.spark.sql.execution.datasources.hbase")
+        .load()
+    }
+
+    val df = withCatalog(catalog)
+
+    // Filter data
+    val s = df.filter((($"col0" <= "row050" && $"col0" > "row040") ||
+      $"col0" === "row005" ||
+      $"col0" === "row020" ||
+      $"col0" ===  "r20" ||
+      $"col0" <= "row005") &&
+      ($"col4" === 1 ||
+        $"col4" === 42))
+      .select("col0", "col1", "col4")
+    s.show
+
+    // Execute SQL
+    df.registerTempTable("table")
+    sqlContext.sql("select count(col1) from table").show
   }
-
-  val df = withCatalog(catalog)
-
-  // Filter data
-  val s = df.filter((($"col0" <= "row050" && $"col0" > "row040") ||
-  $"col0" === "row005" ||
-  $"col0" === "row020" ||
-  $"col0" ===  "r20" ||
-  $"col0" <= "row005") &&
-  ($"col4" === 1 ||
-  $"col4" === 42))
-  .select("col0", "col1", "col4")
-  s.show
-
-  // Execute SQL
-  df.registerTempTable("table")
-  sqlContext.sql("select count(col1) from table").show
 }
