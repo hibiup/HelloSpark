@@ -1,9 +1,12 @@
 /**
   * Run with command:
-  * $ /opt/spark/default/bin/spark-submit \
+  * $ $SPARK_HOME/bin/spark-submit \
+  *     --principal spark@cloud.local \
+  *     --keytab $SPARK_HOME/conf/hadoop.keytab \
   *     --class com.wang.hello.spark.HBaseRead \
   *     --master yarn \
-  *     --files /opt/hbase/default/conf/hbase-site.xml \
+  *     --files $SPARK_HOME/conf/hadoop.keytab \
+  *     --driver-java-options "-Djava.security.auth.login.config=$HBASE_HOME/conf/jaas.conf" \
   *     --packages com.hortonworks:shc-core:1.1.0-2.1-s_2.11 \
   *     --repositories http://repo.hortonworks.com/content/groups/public/ \
   *     --num-executors 4 \
@@ -18,7 +21,7 @@ import org.apache.spark._
 import org.apache.spark.sql.execution.datasources.hbase.HBaseTableCatalog
 
 
-object HelloHBase {
+object SpringHBaseConnector {
   // Defune table
   def catalog = s"""{
                     |"table":{"namespace":"default", "name":"table1"},
